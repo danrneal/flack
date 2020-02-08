@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+
+<html lang="en" class="h-100">
+
+    <head>
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link href="https://stackpath.bootstrapcdn.com/bootswatch/4.4.1/darkly/bootstrap.min.css" rel="stylesheet" integrity="sha384-rCA2D+D9QXuP2TomtQwd+uP50EHjpafN+wruul0sXZzX/Da7Txn4tB9aLMZV4DZm" crossorigin="anonymous">
+        <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet" >
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
+
+        <script>
+            {% if channel_id is defined %}
+                const channelId = "{{ channel_id }}";
+            {% endif %}
+        </script>
+
+        <script id="channel-nav" type="text/x-handlebars-template">
+            {% raw %}
+                <a class="nav-link btn-outline-secondary text-truncate channel" id="channel-{{ channelId }}" data-channel-id="{{ channelId }}" data-channel-name="{{ channelName }}"># {{ channelName }}</a>
+            {% endraw %}
+        </script>
+
+        <script id="channel-title" type="text/x-handlebars-template">
+            <button class="navbar-toggler mr-2" type="button" data-toggle="collapse" data-target="#nav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            {% raw %}
+                # {{ channelName }}
+            {% endraw %}
+        </script>
+
+        <script id="message" type="text/x-handlebars-template">
+            {% raw %}
+                <li class="message list-group-item py-0 pr-2" id="message-{{ id }}" data-message-id="{{ id }}">
+                    {{#if close}}
+                        <button type="button" class="close del mt-2">&times;</button>
+                    {{/if}}
+                    <h6 class="card-title d-inline-block mr-2 mt-3 mb-1"><b>{{ displayName }}</b></h6><small class="card-subtitle text-muted d-inline-block">{{ timestamp }}</small>
+                    <p class="card-text mb-3">{{{ text }}}</p>
+                </li>
+            {% endraw %}
+        </script>
+
+        <script src="{{ url_for('static', filename='js/index.js') }}"></script>
+        <title>Flack</title>
+
+    </head>
+
+    <body class="h-100">
+        <main class="container-fluid h-100 py-3">
+            <div class="modal fade" id="nameModal" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <form class="needs-validation" novalidate>
+
+                            <div class="modal-header text-center">
+                                <h4 class="modal-title w-100">Welcome to Flack!</h4>
+                            </div>
+
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <label class="control-label">Please choose a display name:</label>
+                                    <div class="form-group">
+                                        <div class="input-group mb-3">
+
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">@</span>
+                                            </div>
+
+                                            <input autocomplete="off" autofocus class="form-control rounded-right" id="display-name" name="displayName" placeholder="Display Name" maxlength="32" type="text" required>
+
+                                            <div class="invalid-feedback">
+                                                Display name may not be blank.
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button class="btn btn-success" type="submit">Submit</button>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="channelModal" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <form class="needs-validation" id="channel-form" novalidate>
+
+                            <div class="modal-header">
+                                <h4 class="modal-title">Create Channel</h4>
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            </div>
+
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <label class="control-label">Channel Name:</label>
+                                    <div class="form-group">
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">#</span>
+                                            </div>
+                                            <input autocomplete="off" autofocus class="form-control rounded-right" id="channel-name" name="channelName" placeholder="Channel Name" maxlength="24" type="text" required>
+                                            <div class="invalid-feedback" id="invalid-channel-name"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                <button class="btn btn-success" type="submit">Create Channel</button>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="navbar navbar-expand-md navbar-dark bg-transparent h-100 m-0 p-0">
+                <div class="row h-100">
+
+                    <div class="collapse width d-flex flex-column h-100" id="nav">
+                        <div id="overlay"></div>
+                        <div class="d-flex flex-column px-3 h-100" id="sidebar">
+                            <h4>Flask<button class="close" type="button" data-toggle="collapse" data-target="#nav" id="sidebar-close">&times;</button></h4>
+                            <div class="dropdown-divider"></div>
+                            <h6>Channels</h6>
+                            <div class="nav-pills px-1 h-auto" id="channel-list">
+                                {% for channel in channels %}
+                                    <a class="channel nav-link btn-outline-secondary text-truncate" id="channel-{{ channel.id }}" data-channel-id="{{ channel.id }}" data-channel-name="{{ channel.name }}"># {{ channel.name }}</a>
+                                {% endfor %}
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <button type="button" class="btn btn-outline-success text-truncate pb-2 mb-3" tabindex="-1" data-toggle="modal" data-target="#channelModal">+ Create Channel</button>
+                            <div class="mt-auto dropdown-divider"></div>
+                            <p class="text-truncate" id="current-display-name"></p>
+                        </div>
+                    </div>
+
+                    <div class="col" id="channel">
+                        <div class="card h-100">
+
+                            <h5 class="card-header" id="channel-header"></h5>
+
+                            <div class="card-body mr-1 px-3 py-0" id="message-list">
+                                <ul class="list-group list-group-flush" id="messages"></ul>
+                            </div>
+
+                            <div class="card-footer">
+                                <form>
+                                    <div class="input-group">
+                                        <textarea autocomplete="off" autofocus class="form-control" name="message" id="message-text" style="height:36px;"></textarea>
+                                    </div>
+                                </form>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </nav>
+        </main>
+    </body>
+</html>
