@@ -32,6 +32,14 @@ command prompt). If not `source /venv/bin/activate` to enter it.
 Usage: flask run
 ```
 
+## Screenshots
+
+![](https://i.imgur.com/ZWpJymj.png)
+
+![](https://i.imgur.com/o03PBS1.png)
+
+![](https://i.imgur.com/olpK4uE.png)
+
 ## Credit
 
 [HarvardX: CS50's Web Programming with Python and JavaScript](https://www.edx.org/course/cs50s-web-programming-with-python-and-javascript)
