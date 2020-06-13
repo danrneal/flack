@@ -5,40 +5,36 @@ This flask-based chat app uses socketIO to allow messages to be shown in real ti
 ## Set-up
 
 Set-up a virtual environment and activate it:
+
+```bash
+python3 -m venv env
+source env/bin/activate
 ```
-python3 -m venv venv
-source venv/bin/activate
-```
-You should see (venv) before your command prompt now. (You can type `deactivate`
-to exit the virtual environment any time.)
+
+You should see (env) before your command prompt now. (You can type `deactivate` to exit the virtual environment any time.)
 
 Install the requirements:
-```
-pip install -r requirements.txt
-```
 
-Set up your environment variables:
-```
-touch .env
-echo FLASK_APP="application.py" >> .env
+```bash
+pip install -U pip
+pip install -r requirements.txt
 ```
 
 ## Usage
 
-Make sure you are in the virtual environment (you should see (venv) before your
-command prompt). If not `source /venv/bin/activate` to enter it.
+Make sure you are in the virtual environment (you should see (env) before your command prompt). If not `source /env/bin/activate` to enter it.
 
-```
+```bash
 Usage: flask run
 ```
 
 ## Screenshots
 
-![](https://i.imgur.com/ZWpJymj.png)
+![Flack Welcome](https://i.imgur.com/ZWpJymj.png)
 
-![](https://i.imgur.com/o03PBS1.png)
+![Flack App](https://i.imgur.com/o03PBS1.png)
 
-![](https://i.imgur.com/olpK4uE.png)
+![Flack Create Channel](https://i.imgur.com/olpK4uE.png)
 
 ## Credit
 
