@@ -1,7 +1,3 @@
-env
-venv
-.env
-flask_session
-__pycache__
-.vscode
-.history
+__pycache__/
+*.pyc
+env/
